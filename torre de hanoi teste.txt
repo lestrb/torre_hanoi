@@ -1,0 +1,231 @@
+﻿; Torre de Hanoi - NASM x86_64 - correção para perda de rax
+section .data
+    msg_intro     db "Algoritmo da Torre de Hanoi com ", 0
+    msg_discos    db " discos", 10, 0
+    msg_move      db "Mova disco ", 0
+    msg_de        db " da Torre ", 0
+    msg_para      db " para a Torre ", 0
+    msg_concluido db "Concluido!", 10, 0
+    newline       db 10, 0
+
+
+section .bss
+    num    resb 2      ; leitura (ex: "3\n")
+    n      resq 1      ; guarda o n numeric (qword) pra não perder
+    buffer resb 1      ; para print_char
+
+
+section .text
+    global _start
+
+
+; ---------------------------
+; print_string: RSI=endereco, RDX=tamanho
+; ---------------------------
+print_string:
+    mov rax, 1
+    mov rdi, 1
+    syscall
+    ret
+
+
+; ---------------------------
+; print_char: AL = caractere
+; ---------------------------
+print_char:
+    mov byte [buffer], al
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [rel buffer]
+    mov rdx, 1
+    syscall
+    ret
+
+
+; ---------------------------
+; print_number: AL = 0..9
+; ---------------------------
+print_number:
+    add al, '0'
+    call print_char
+    ret
+
+
+; ---------------------------
+; mover(disco, origem, destino)
+; parametros: RDI = disco, RSI = origem (char), RDX = destino (char)
+; ---------------------------
+mover:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 32
+
+
+    mov [rbp-8],  rdi    ; disco (qword)
+    mov [rbp-16], rsi    ; origem (qword)
+    mov [rbp-24], rdx    ; destino (qword)
+
+
+    ; "Mova disco "
+    lea rsi, [rel msg_move]
+    mov rdx, 11
+    call print_string
+
+
+    ; imprime número (usa AL)
+    mov al, byte [rbp-8]
+    call print_number
+
+
+    ; " da Torre "
+    lea rsi, [rel msg_de]
+    mov rdx, 10
+    call print_string
+
+
+    ; origem (char)
+    mov al, byte [rbp-16]
+    call print_char
+
+
+    ; " para a Torre "
+    lea rsi, [rel msg_para]
+    mov rdx, 14
+    call print_string
+
+
+    ; destino (char)
+    mov al, byte [rbp-24]
+    call print_char
+
+
+    ; newline
+    lea rsi, [rel newline]
+    mov rdx, 1
+    call print_string
+
+
+    leave
+    ret
+
+
+; ---------------------------
+; hanoi(n, origem, destino, auxiliar)
+; parametros: RDI = n, RSI = origem, RDX = destino, RCX = auxiliar
+; ---------------------------
+hanoi:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 64
+
+
+    mov [rbp-8],  rdi    ; n
+    mov [rbp-16], rsi    ; origem
+    mov [rbp-24], rdx    ; destino
+    mov [rbp-32], rcx    ; auxiliar
+
+
+    ; carregar n para rax e comparar
+    mov rax, [rbp-8]
+    cmp rax, 1
+    je .base_case
+
+
+    ; hanoi(n-1, origem, auxiliar, destino)
+    mov rax, [rbp-8]
+    dec rax
+    mov rdi, rax
+    mov rsi, qword [rbp-16]   ; origem
+    mov rdx, qword [rbp-32]   ; auxiliar
+    mov rcx, qword [rbp-24]   ; destino
+    call hanoi
+
+
+    ; mover(n, origem, destino)
+    mov rdi, [rbp-8]
+    mov rsi, qword [rbp-16]
+    mov rdx, qword [rbp-24]
+    call mover
+
+
+    ; hanoi(n-1, auxiliar, destino, origem)
+    mov rax, [rbp-8]
+    dec rax
+    mov rdi, rax
+    mov rsi, qword [rbp-32]   ; auxiliar
+    mov rdx, qword [rbp-24]   ; destino
+    mov rcx, qword [rbp-16]   ; origem
+    call hanoi
+
+
+    jmp .end
+
+
+.base_case:
+    ; mover(1, origem, destino)
+    mov rdi, 1
+    mov rsi, qword [rbp-16]
+    mov rdx, qword [rbp-24]
+    call mover
+
+
+.end:
+    leave
+    ret
+
+
+; ---------------------------
+; _start - main
+; ---------------------------
+_start:
+    ; header
+    lea rsi, [rel msg_intro]
+    mov rdx, 32
+    call print_string
+
+
+    ; read 1 dígito (ex: "3\n")
+    mov rax, 0
+    mov rdi, 0
+    lea rsi, [rel num]
+    mov rdx, 2
+    syscall
+
+
+    ; converter ASCII->numero e salvar em [n] ANTES de chamar print_number
+    movzx eax, byte [num]  ; EAX = ascii
+    sub al, '0'            ; AL = número
+    movzx rax, al
+    mov qword [n], rax     ; salva n seguro na memória
+
+
+    ; imprimir o número (usa AL)
+    mov al, byte [num]
+    sub al, '0'
+    call print_number
+
+
+    ; " discos\n"
+    lea rsi, [rel msg_discos]
+    mov rdx, 8
+    call print_string
+
+
+    ; carregar n salvo e chamar hanoi(n, 'A', 'C', 'B')
+    mov rdi, qword [n]     ; n seguro (qword)
+    mov rsi, 'A'
+    mov rdx, 'C'
+    mov rcx, 'B'
+    call hanoi
+
+
+    ; final
+    lea rsi, [rel msg_concluido]
+    mov rdx, 11
+    call print_string
+
+
+    ; exit(0)
+    mov rax, 60
+    xor rdi, rdi
+    syscall
