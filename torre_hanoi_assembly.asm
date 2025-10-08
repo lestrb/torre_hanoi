@@ -1,4 +1,4 @@
-; Torre de Hanoi - NASM x86_64 - correção para perda de rax
+; Tore de Hanoi - NASM x86_64 - correção para perda de rax
 section .data
     msg_intro     db "Algoritmo da Torre de Hanoi com ", 0
     msg_discos    db " discos", 10, 0
