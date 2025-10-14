@@ -35,8 +35,22 @@ _print:
     ret
 
 _hanoi:
-    cmp ah, 0               ; checa se input foi 0 (0 discos)
-    jz fim
+    cmp ah, 1               ; checa se input foi 1 
+    jne .maior_que_um       ; se for diferente de 1, pula
+
+    mov byte [msg_movimentos + 11], '1'
+    mov byte [msg_movimentos + 22], 'A'
+    mov byte [msg_movimentos + 37], 'C'
+    mov rbx, msg_movimentos
+    mov rcx, msg_movimentos_len
+    call _print
+    ret
+
+ ; 2 pra cima faz a lógica de push e pull
+ .maior_que_um:
+    
+
+
 
 _start:
     ; Inicializa rsp para o topo da pilha
