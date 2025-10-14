@@ -1,6 +1,6 @@
 ; Hanoi
-; dh -> número do input em ascii
-; dl -> número do input "normal"
+; ah -> número do input em ascii
+; al -> número do input "normal"
 ; rbx -> mensagem a ser printada
 ; rcx -> tamanho da mensagem
 
@@ -49,12 +49,12 @@ _start:
     syscall 
     
     ; converte número ascii do input em numero
-    mov dl, [numero]        ; al guarda caractere em ascii (pro print)
-    mov dh, [numero]        
-    sub dh, '0'             ; converte em numero e fica em ah (pra decrementar e incrementar)
+    mov al, [numero]        ; al guarda caractere em ascii (pro print)
+    mov ah, [numero]        
+    sub ah, '0'             ; converte em numero e fica em ah (pra decrementar e incrementar)
     
     ; output indicando número de discos
-    mov byte [msg_inicial + 32], dl   ; substitui o 'X' pelo número 
+    mov byte [msg_inicial + 32], al   ; substitui o 'X' pelo número 
     mov rbx, msg_inicial
     mov rcx, msg_inicial_len
     call _print
