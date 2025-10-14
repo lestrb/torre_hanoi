@@ -11,6 +11,9 @@ section .data
 
     msg_movimentos db 'Mova disco X da Torre Y para a Torre Z', 10 ; posições: x-11, y-22, z-37
     msg_movimentos_len equ $ - msg_movimentos
+
+    msg_concluido db 'Concluido!', 10
+    msg_concluido_len equ $ - msg_concluido
     
 section .bss
     numero resb 1
@@ -26,6 +29,8 @@ _print:
     mov rdx, rcx            ; rcx -> tamanho da mensagem
     syscall
     ret
+_hanoi:
+    
 
 _start:
     ; output pedindo número de discos
