@@ -1,6 +1,8 @@
 ; Hanoi
-; ah -> guarda número do input em ascii
-; bh -> guarda número do input "normal"
+; dh -> número do input em ascii
+; dl -> número do input "normal"
+; rbx -> mensagem a ser printada
+; rcx -> tamanho da mensagem
 
 section .data
     msg_discos db 'Digite o numero de discos (entre 0 e 9): ', 10
@@ -29,8 +31,9 @@ _print:
     mov rdx, rcx            ; rcx -> tamanho da mensagem
     syscall
     ret
+
 _hanoi:
-    
+
 
 _start:
     ; output pedindo número de discos
@@ -46,12 +49,12 @@ _start:
     syscall 
     
     ; converte número ascii do input em numero
-    mov bh, [numero]        ; bh guarda caractere em ascii (pro print)
-    mov ah, [numero]        
-    sub ah, '0'             ; converte em numero e fica em ah (pra decrementar e incrementar)
+    mov dl, [numero]        ; al guarda caractere em ascii (pro print)
+    mov dh, [numero]        
+    sub dh, '0'             ; converte em numero e fica em ah (pra decrementar e incrementar)
     
     ; output indicando número de discos
-    mov byte [msg_inicial + 32], bh   ; substitui o 'X' pelo número 
+    mov byte [msg_inicial + 32], dl   ; substitui o 'X' pelo número 
     mov rbx, msg_inicial
     mov rcx, msg_inicial_len
     call _print
