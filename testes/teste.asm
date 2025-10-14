@@ -3,6 +3,7 @@
 ; ah -> número do input "normal"
 ; rbx -> mensagem a ser printada
 ; rcx -> tamanho da mensagem
+; r8, r9 e r10 -> discos A, B e C
 
 section .data
     msg_discos db 'Digite o numero de discos (entre 0 e 9): ', 10
