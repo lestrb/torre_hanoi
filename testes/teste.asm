@@ -68,7 +68,10 @@ _start:
     mov rcx, msg_inicial_len
     call _print
 
-    ; chama função hanoi
+    ; chama função hanoi (ah -> numero de discos)
+    mov r8, 'A'
+    mov r9, 'B'
+    mov r10, 'C'
     call _hanoi
 
 fim:    
