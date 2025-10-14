@@ -1,4 +1,4 @@
-# Torre de Hanoi — Assembly x86_64 (NASM)
+# Torre de Hanoi em Assembly x86_64 (NASM)
 
 Implementação do **algoritmo recursivo da Torre de Hanoi** em **Assembly x86-64 (NASM)**.
 O programa lê um número entre **0 e 9** e exibe os movimentos necessários para resolver o problema.
