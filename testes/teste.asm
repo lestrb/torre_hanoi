@@ -61,7 +61,7 @@ _start:
 
     ; checa se input (ah) foi diferente de 0 pra printar frase e seguir
     cmp ah, 0               
-    jz fim                  ; se ah == 0, pula direto para fim e não printa frase 
+    jz fim                  ; se ah == 0, pula direto para fim e não printa frase nem chama hanoi
 
     ; output indicando número de discos
     mov byte [msg_inicial + 32], al   ; substitui o 'X' pelo número 
