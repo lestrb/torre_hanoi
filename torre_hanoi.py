@@ -1,7 +1,6 @@
 # Torre de Hanoi
 def hanoi (n, origem, destino, auxiliar):
-    if n == 1:
-        print(f"Mover disco 1 de {origem} para {destino}")
+    if n == 0:
         return
     else:
         hanoi(n - 1, origem, auxiliar, destino)
@@ -12,4 +11,5 @@ def hanoi (n, origem, destino, auxiliar):
 n = int(input("Número de discos: "))
 
 # Roda o algoritmo
+
 hanoi(n, 'A', 'C', 'B')  # A, B e C: nomes dos pinos
