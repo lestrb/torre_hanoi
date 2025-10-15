@@ -5,6 +5,11 @@
 ; rcx -> tamanho da mensagem
 ; r8, r9 e r10 -> discos A, B e C
 
+; tentar dar push antes do syscall e pop depois, usando rax, rbx, rcx e rdx pros registradores de hanoi pra ver se saem mensagens
+; NAO TA PRINTANDO FRASE
+; CHAT SUGERIU MUDAR AH POR RSI
+
+
 section .data
     msg_hanoi db 'Torre de Hanoi!', 10
     msg_hanoi_len equ $ - msg_hanoi
