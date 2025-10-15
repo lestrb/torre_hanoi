@@ -1,0 +1,137 @@
+; Torre de Hanoi - NASM x86_64 - Versão Final Compacta (101 linhas)
+section .data
+msg_intro db "Algoritmo da Torre de Hanoi com X discos", 10
+len_intro equ $ - msg_intro
+msg_move db "Mova disco Y da Torre A para a Torre C", 10
+len_move equ $ - msg_move
+; Posições: Y-11, A-22, C-37
+msg_concluido db "Concluido!", 10
+len_concluido equ $ - msg_concluido
+num_temp db " ", 0 ; Buffer para I/O
+
+section .bss
+n resq 1 ; Número de discos (valor numérico)
+
+section .text
+global _start
+
+; Rotina única de escrita (RSI=addr, RDX=len)
+sys_write_msg:
+    mov rax, 1
+    mov rdi, 1
+    syscall
+    ret
+
+; mover(disco, origem, destino): RDI=disco, RSI=origem, RDX=destino
+mover:
+    push r12
+    push r13
+    push r14
+    movzx r12, dil
+    movzx r13, sil
+    movzx r14, dl
+
+    ; Modifica a string e imprime
+    mov al, r12b
+    add al, '0'
+    mov byte [msg_move + 11], al
+    mov byte [msg_move + 22], r13b
+    mov byte [msg_move + 37], r14b
+
+    mov rsi, msg_move
+    mov rdx, len_move
+    call sys_write_msg
+    
+    pop r14
+    pop r13
+    pop r12
+    ret
+
+; hanoi(n, origem, destino, auxiliar): RDI=n, RSI=origem, RDX=destino, RCX=auxiliar
+hanoi:
+    push r12
+    push r13
+    push r14
+    push r15
+    mov r12, rdi
+    mov r13, rsi
+    mov r14, rdx
+    mov r15, rcx
+
+    cmp r12, 1
+    je .base_case
+
+    ; hanoi(n-1, origem, auxiliar, destino)
+    mov rdi, r12
+    dec rdi
+    mov rsi, r13
+    mov rdx, r15
+    mov rcx, r14
+    call hanoi
+
+    ; mover(n, origem, destino)
+    mov rdi, r12
+    mov rsi, r13
+    mov rdx, r14
+    call mover
+
+    ; hanoi(n-1, auxiliar, destino, origem)
+    mov rdi, r12
+    dec rdi
+    mov rsi, r15
+    mov rdx, r14
+    mov rcx, r13
+    call hanoi
+
+    jmp .end
+
+.base_case:
+    mov rdi, 1
+    mov rsi, r13
+    mov rdx, r14
+    call mover
+
+.end:
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    ret
+
+; _start - main
+_start:
+    ; read 1 dígito
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, num_temp
+    mov rdx, 1
+    syscall
+    
+    ; converte e salva n
+    movzx eax, byte [num_temp]
+    sub al, '0'
+    movzx rax, al
+    mov qword [n], rax
+
+    ; output inicial (Header)
+    mov al, byte [num_temp]
+    mov byte [msg_intro + 32], al
+    mov rsi, msg_intro
+    mov rdx, len_intro
+    call sys_write_msg
+
+    ; chama hanoi(n, 'A', 'B', 'C')
+    mov rdi, qword [n]
+    mov rsi, 'A'
+    mov rdx, 'C'
+    mov rcx, 'B'
+    call hanoi
+
+    ; output final
+    mov rsi, msg_concluido
+    mov rdx, len_concluido
+    call sys_write_msg
+
+    mov rax, 60
+    xor rdi, rdi
+    syscall
