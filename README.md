@@ -6,7 +6,7 @@ O programa lê um número entre **0 e 9** e exibe os movimentos necessários par
 Testado no compilador online: https://www.tutorialspoint.com/compilers/online-assembly-compiler.htm
 
 ## Instruções para testar o código
-1. Acesse o link acima e selecione **NASM (64-bit)** 
+1. Acesse o link acima do **Online Assembly (NASM) Compiler**
 2. Cole o código completo no editor
 3. Digite um número de **0 a 9** em **Program Input**
 4. Clique em **Execute**
