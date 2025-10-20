@@ -62,7 +62,7 @@ _hanoi:
     add ah, '0'                               ; converte numero de discos pra ASCII
     mov byte [msg_movimentos + 11], ah        ; número do disco em ASCII
     mov byte [msg_movimentos + 22], r9b       ; torre origem
-    mov byte [msg_movimentos + 37], r13b      ; torre destino  ------------ NAO SERIA O R13?
+    mov byte [msg_movimentos + 37], r11b      ; torre destino  ------------ NAO SERIA O R13?
     mov rbx, msg_movimentos
     mov rcx, msg_movimentos_len
     call _print
@@ -81,8 +81,8 @@ _hanoi:
 
     ; troca os registradores de auxiliar/destino e decrementa num de discos
     mov r12, r9          ; origem em r12
-    mov r9, r13          ; nova origem = auxiliar
-    mov r13, r12         ; nova auxiliar = antiga origem
+    mov r9, r11          ; nova origem = auxiliar
+    mov r11, r12         ; nova auxiliar = antiga origem
     dec ah               ; n = n - 1
 
     ; hanoi(n-1, auxiliar, destino, origem)
