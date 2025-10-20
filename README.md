@@ -3,8 +3,7 @@
 Implementação do **algoritmo recursivo da Torre de Hanoi** em **Assembly x86-64 (NASM)**.
 O programa lê um número entre **0 e 9** e exibe os movimentos necessários para resolver o problema.
 
-Testado no compilador online:  
-[https://www.tutorialspoint.com/compilers/online-assembly-compiler.htm]
+Testado no compilador online: https://www.tutorialspoint.com/compilers/online-assembly-compiler.htm
 
 ## Instruções para testar o código
 1. Acesse o link acima e selecione **NASM (64-bit)** 
