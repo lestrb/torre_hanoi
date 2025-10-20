@@ -3,7 +3,7 @@
 ; ah -> número do input "normal"
 ; rbx -> mensagem a ser printada
 ; rcx -> tamanho da mensagem
-; r9, r11 e r13 -> discos A, B e C
+; r9, r11 e r13 -> discos A, B e C inicialmente
 ; r15 -> registrador para auxiliar na troca de valores
 
 section .data
@@ -58,11 +58,11 @@ _hanoi:
     call _hanoi              
 
     ; imprime o movimento atual
-    mov ah, byte [rsp + 1]    ; recupera o AH original (foi salvo em RAX no topo da pilha)
+    mov ah, byte [rsp + 1]   				  ; recupera o ah original (salvo em rax no topo da pilha)
     add ah, '0'                               ; converte numero de discos pra ASCII
     mov byte [msg_movimentos + 11], ah        ; número do disco em ASCII
     mov byte [msg_movimentos + 22], r9b       ; torre origem
-    mov byte [msg_movimentos + 37], r11b      ; torre destino  ------------ NAO SERIA O R13?
+    mov byte [msg_movimentos + 37], r11b      ; torre destino 
     mov rbx, msg_movimentos
     mov rcx, msg_movimentos_len
     call _print
@@ -99,8 +99,8 @@ _hanoi:
 
 _start:
     ; Inicializa rsp para o topo da pilha
-    lea rsp, [pilha + 4096]  ; pilha cresce para baixo (lea calcula o endereço e coloca em rsp)
-    and rsp, -16
+    lea rsp, [pilha + 4096]  ; pilha cresce para baixo (lea calcula o endereço do topo da pilha e coloca em rsp)
+    and rsp, -16			 ; alinha o valor de rsp para um múltiplo de 16 
 
     ; output dizendo que é torre de hanoi
     mov rbx, msg_hanoi
@@ -118,13 +118,9 @@ _start:
     mov rsi, numero        
     mov rdx, 1              ; le 1 byte
     syscall 
-    
-    ; converte número ascii do input em numero
-    mov al, [numero]        ; al guarda caractere em ascii (pro print)
-    mov ah, [numero]        
-    sub ah, '0'             ; converte em numero e fica em ah (pra decrementar e incrementar)
 
     ; output indicando número de discos
+	mov al, [numero]       			  ; al guarda o número do input em ascii (pro print)
     mov byte [msg_inicial + 32], al   ; substitui o 'X' pelo número 
     mov rbx, msg_inicial
     mov rcx, msg_inicial_len
@@ -135,8 +131,8 @@ _start:
     mov r11, 'B'
     mov r13, 'C'
 
-    mov ah, byte [numero]
-    sub ah, '0'
+    mov ah, byte [numero]		
+    sub ah, '0'				; converte ascii pra numero e fica em ah (pra decrementar e incrementar)
 
     call _hanoi
 
@@ -147,6 +143,6 @@ fim:
     call _print
 
     ; exit system call
-    mov rax, 60         ; sys_exit
-    mov rdi, 0          ; exit status
+    mov rax, 60        		; sys_exit
+    mov rdi, 0         		; exit status
     syscall
