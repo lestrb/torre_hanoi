@@ -3,12 +3,8 @@
 ; ah -> número do input "normal"
 ; rbx -> mensagem a ser printada
 ; rcx -> tamanho da mensagem
-; r8, r9 e r10 -> discos A, B e C
-
-; tentar dar push antes do syscall e pop depois, usando rax, rbx, rcx e rdx pros registradores de hanoi pra ver se saem mensagens
-; NAO TA PRINTANDO FRASE
-; CHAT SUGERIU MUDAR AH POR RSI
-
+; r9, r11 e r13 -> discos A, B e C
+; r15 -> registrador para auxiliar na troca de valores
 
 section .data
     msg_hanoi db 'Torre de Hanoi!', 10
@@ -48,53 +44,54 @@ _hanoi:
 
     ; caso não seja 0, empilha o estado atual antes da chamada recursiva
     push r9                ; torre origem
-    push r10               ; torre destino
-    push r11               ; torre auxiliar
-    push ax                ; número de discos (ah)
+    push r11               ; torre destino
+    push r13               ; torre auxiliar
+    push rax                ; número de discos (ah)
 
     ; troca os registradores de auxiliar/destino e decrementa num de discos
-    mov r12, r10           ; salva destino em r12
-    mov r10, r11           ; salva aux no antigo destino
-    mov r11, r12           ; salva destino na antiga aux            
+    mov r12, r11           ; salva destino em r12
+    mov r11, r13           ; salva aux no antigo destino
+    mov r13, r12           ; salva destino na antiga aux            
     dec ah                 ; n = n - 1
 
     ; hanoi(n-1, origem, auxiliar, destino)
-    call _hanoi
-
-    ; desempilha o estado antes da chamada recursiva
-    pop ax            
-    pop r11            
-    pop r10              
-    pop r9               
+    call _hanoi              
 
     ; imprime o movimento atual
-    add ah, '0'                               ; converte numero de discos ṕra ASCII
-    mov [msg_movimentos + 11], ah        ; número do disco em ASCII
-    mov [msg_movimentos + 22], r9        ; torre origem
-    mov [msg_movimentos + 37], r10       ; torre destino
+    mov ah, byte [rsp + 1]    ; recupera o AH original (foi salvo em RAX no topo da pilha)
+    add ah, '0'                               ; converte numero de discos pra ASCII
+    mov byte [msg_movimentos + 11], ah        ; número do disco em ASCII
+    mov byte [msg_movimentos + 22], r9b       ; torre origem
+    mov byte [msg_movimentos + 37], r13b      ; torre destino  ------------ NAO SERIA O R13?
     mov rbx, msg_movimentos
     mov rcx, msg_movimentos_len
     call _print
+	
+    ; desempilha o estado antes da chamada recursiva
+    pop rax            
+    pop r13            
+    pop r11              
+    pop r9 
 
     ; empilha novamente o estado antes da segunda chamada recursiva
     push r9
-    push r10
     push r11
-    push ax
+    push r13
+    push rax
 
     ; troca os registradores de auxiliar/destino e decrementa num de discos
     mov r12, r9          ; origem em r12
-    mov r9, r11          ; nova origem = auxiliar
-    mov r11, r12         ; nova auxiliar = antiga origem
+    mov r9, r13          ; nova origem = auxiliar
+    mov r13, r12         ; nova auxiliar = antiga origem
     dec ah               ; n = n - 1
 
     ; hanoi(n-1, auxiliar, destino, origem)
     call _hanoi
 
     ; desempilha o estado antes da chamada recursiva
-    pop ax
+    pop rax
+    pop r13
     pop r11
-    pop r10
     pop r9
 
 .fim_hanoi: 
@@ -103,6 +100,7 @@ _hanoi:
 _start:
     ; Inicializa rsp para o topo da pilha
     lea rsp, [pilha + 4096]  ; pilha cresce para baixo (lea calcula o endereço e coloca em rsp)
+    and rsp, -16
 
     ; output dizendo que é torre de hanoi
     mov rbx, msg_hanoi
@@ -133,9 +131,13 @@ _start:
     call _print
 
     ; chama função hanoi (ah -> numero de discos)
-    mov r8, 'A'
-    mov r9, 'B'
-    mov r10, 'C'
+    mov r9, 'A'
+    mov r11, 'B'
+    mov r13, 'C'
+
+    mov ah, byte [numero]
+    sub ah, '0'
+
     call _hanoi
 
 fim:    
