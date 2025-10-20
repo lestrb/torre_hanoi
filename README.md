@@ -12,4 +12,4 @@ Testado no compilador online:
 3. Digite um número de **0 a 9** em **Program Input**
 4. Clique em **Execute**
 
-Se o número for **0**, o programa termina imediatamente. Caso contrário, ele imprime a sequência de movimentos da **Torre de Hanoi**!
+Se o número for **0**, o programa será concluído imediatamente. Caso contrário, ele imprime a sequência de movimentos da **Torre de Hanoi**!
